@@ -47,7 +47,7 @@ def process_file(filename):
     return [enterprise, community, revenue]
 
 def write_usage(usage):
-    print('Date,Enterprise,Community,Total')
+    print('Date,Enterprise,Community,Total,Revenue')
     for date in usage:
         total = usage[date]['enterprise']+usage[date]['community']
         print(date + ',' + str(usage[date]['enterprise']) + ',' + str(usage[date]['community']) + ',' + str(total) + ',' + str(usage[date]['revenue']))
