@@ -2,14 +2,24 @@ import os
 import csv
 
 def run():
+    usage={}
     filenames=get_filenames()
 
     for filename in filenames:
         [enterprise, community] = process_file(filename)
 
         #filenames look like daily_business_usage_by_instance_type_2015-04-02.csv
-        s=filename[38:]
-        print(s)
+        date=filename[48:55]
+
+        if not date in usage:
+            usage[date]={}
+            usage[date]['enterprise']=0
+            usage[date]['community']=0
+
+        usage[date]['enterprise']+=enterprise
+        usage[date]['community']+=community
+
+    write_usage(usage)
 
 def get_filenames():
     filenames=[]
@@ -32,4 +42,7 @@ def process_file(filename):
 
     return [enterprise, community]
 
+def write_usage(usage):
+    pass
+    
 run()
