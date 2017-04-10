@@ -9,7 +9,7 @@ def run():
         [enterprise, community] = process_file(filename)
 
         #filenames look like daily_business_usage_by_instance_type_2015-04-02.csv
-        date=filename[48:55]
+        date=filename[48:55] + '-1'
 
         if not date in usage:
             usage[date]={}
@@ -43,6 +43,9 @@ def process_file(filename):
     return [enterprise, community]
 
 def write_usage(usage):
-    pass
-    
+    print('Date,Enterprise,Community,Total')
+    for date in usage:
+        total = usage[date]['enterprise']+usage[date]['community']
+        print(date + ',' + str(usage[date]['enterprise']) + ',' + str(usage[date]['community']) + ',' + str(total))
+
 run()
