@@ -22,5 +22,4 @@ do
    --role-name-arn arn:aws:iam::728631713266:role/MarketplaceCommerceAnalyticsRole \
    --destination-s3-bucket-name marketplacereporting \
    --sns-topic-arn arn:aws:sns:us-east-1:728631713266:marketplacereporting
-
 done
