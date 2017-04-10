@@ -6,7 +6,7 @@ def run():
     filenames=get_filenames()
 
     for filename in filenames:
-        [enterprise, community] = process_file(filename)
+        [enterprise, community, revenue] = process_file(filename)
 
         #filenames look like daily_business_usage_by_instance_type_2015-04-02.csv
         date=filename[48:55] + '-1'
@@ -15,9 +15,11 @@ def run():
             usage[date]={}
             usage[date]['enterprise']=0
             usage[date]['community']=0
+            usage[date]['revenue']=0
 
         usage[date]['enterprise']+=enterprise
         usage[date]['community']+=community
+        usage[date]['revenue']+=revenue
 
     write_usage(usage)
 
@@ -31,6 +33,7 @@ def get_filenames():
 def process_file(filename):
     community=0
     enterprise=0
+    revenue=0
 
     with open(filename) as csvfile:
         reader = csv.DictReader(csvfile)
@@ -39,13 +42,14 @@ def process_file(filename):
                 enterprise+=int(row['Usage Units'])
             else:
                 community+=int(row['Usage Units'])
+            revenue+=float(row['Estimated Revenue'])
 
-    return [enterprise, community]
+    return [enterprise, community, revenue]
 
 def write_usage(usage):
     print('Date,Enterprise,Community,Total')
     for date in usage:
         total = usage[date]['enterprise']+usage[date]['community']
-        print(date + ',' + str(usage[date]['enterprise']) + ',' + str(usage[date]['community']) + ',' + str(total))
+        print(date + ',' + str(usage[date]['enterprise']) + ',' + str(usage[date]['community']) + ',' + str(total) + ',' + str(usage[date]['revenue']))
 
 run()
