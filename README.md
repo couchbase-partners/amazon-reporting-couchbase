@@ -1,3 +1,3 @@
 # amazon-reporting
 
-Internal Scripts for creating AWS reports
+This scripts download marketplace reports and create graphs from them.
