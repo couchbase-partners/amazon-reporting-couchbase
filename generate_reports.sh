@@ -15,13 +15,12 @@ do
    timestamp=`date -j -v +${i}d -f "%Y%m%d" ${start_date} +%Y-%m-%d`T00:00:00.000Z
    echo $timestamp
    i=`expr $i + 1`
+
+   aws marketplacecommerceanalytics generate-data-set \
+   --data-set-type daily_business_usage_by_instance_type \
+   --data-set-publication-date $timestamp \
+   --role-name-arn arn:aws:iam::728631713266:role/MarketplaceCommerceAnalyticsRole \
+   --destination-s3-bucket-name marketplacereporting \
+   --sns-topic-arn arn:aws:sns:us-east-1:728631713266:marketplacereporting
+
 done
-
-
-
-#aws marketplacecommerceanalytics generate-data-set \
-#--data-set-type daily_business_usage_by_instance_type \
-#--data-set-publication-date $date \
-#--role-name-arn arn:aws:iam::728631713266:role/MarketplaceCommerceAnalyticsRole \
-#--destination-s3-bucket-name marketplacereporting \
-#--sns-topic-arn arn:aws:sns:us-east-1:728631713266:marketplacereporting
