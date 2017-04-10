@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # You to be logged in as aws_partnership@couchbase.com with the AWS CLI to run this.
-# This script was written on a Mac.  Date seems to behave differently on Linux.
+# This script was written on a Mac.  date seems to behave differently on Linux.
 
 # This report isn't available before 2015-01-26
 
