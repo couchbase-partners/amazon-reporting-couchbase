@@ -6,19 +6,21 @@ def run():
     filenames=get_filenames()
 
     for filename in filenames:
-        [enterprise, community, revenue] = process_file(filename)
+        [hourly, byol, legacy, revenue] = process_file(filename)
 
         #filenames look like daily_business_usage_by_instance_type_2015-04-02.csv
         date=filename[48:55] + '-1'
 
         if not date in usage:
             usage[date]={}
-            usage[date]['enterprise']=0
-            usage[date]['community']=0
+            usage[date]['hourly']=0
+            usage[date]['byol']=0
+            usage[date]['legacy']=0
             usage[date]['revenue']=0
 
-        usage[date]['enterprise']+=enterprise
-        usage[date]['community']+=community
+        usage[date]['hourly']+=hourly
+        usage[date]['byol']+=byol
+        usage[date]['legacy']+=legacy
         usage[date]['revenue']+=revenue
 
     write_usage(usage)
@@ -31,25 +33,28 @@ def get_filenames():
     return filenames
 
 def process_file(filename):
-    community=0
-    enterprise=0
+    hourly=0
+    byol=0
+    legacy=0
     revenue=0
 
     with open(filename) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            if 'Enterprise' in row['Product Title']:
-                enterprise+=int(row['Usage Units'])
+            if 'Hourly' in row['Product Title']:
+                hourly+=int(row['Usage Units'])
+            elif 'BYOL' in row['Product Title']:
+                byol+=int(row['Usage Units'])
             else:
-                community+=int(row['Usage Units'])
+                legacy+=int(row['Usage Units'])
             revenue+=float(row['Estimated Revenue'])
 
-    return [enterprise, community, revenue]
+    return [hourly, byol, legacy, revenue]
 
 def write_usage(usage):
-    print('Month,Enterprise Usage,Community Usage,Total Usage,Revenue')
+    print('Month, Hourly Pricing Usage, BYOL Usage, Legacy Usage, Total Usage, Revenue')
     for date in usage:
-        total = usage[date]['enterprise']+usage[date]['community']
-        print(date + ',' + str(usage[date]['enterprise']) + ',' + str(usage[date]['community']) + ',' + str(total) + ',' + str(usage[date]['revenue']))
+        total = usage[date]['hourly']+usage[date]['byol']+usage[date]['legacy']
+        print(date + ', ' + str(usage[date]['hourly']) + ', ' + str(usage[date]['byol']) + ', ' + str(usage[date]['legacy']) + ', ' + str(total) + ', ' + str(usage[date]['revenue']))
 
 run()
