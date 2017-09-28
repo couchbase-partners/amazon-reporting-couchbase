@@ -1,30 +1,12 @@
 import os
 import csv
 
+usage={}
+
 def run():
-    usage={}
     filenames=get_filenames()
-
     for filename in filenames:
-        [hourly, byol, legacy, revenue, legacyrevenue] = process_file(filename)
-
-        #filenames look like daily_business_usage_by_instance_type_2015-04-02.csv
-        date=filename[48:55] + '-1'
-
-        if not date in usage:
-            usage[date]={}
-            usage[date]['hourly']=0
-            usage[date]['byol']=0
-            usage[date]['legacy']=0
-            usage[date]['revenue']=0
-            usage[date]['legacyrevenue']=0
-
-        usage[date]['hourly']+=hourly
-        usage[date]['byol']+=byol
-        usage[date]['legacy']+=legacy
-        usage[date]['revenue']+=revenue
-        usage[date]['legacyrevenue']+=legacyrevenue
-
+        process_file(filename)
     write_usage(usage)
 
 def get_filenames():
@@ -35,31 +17,47 @@ def get_filenames():
     return filenames
 
 def process_file(filename):
-    hourly=0
-    byol=0
-    legacy=0
-    revenue=0
-    legacyrevenue=0
+    #filenames look like daily_business_usage_by_instance_type_2015-04-02.csv
+    date=filename[48:55] + '-1'
+
+    if not date in usage:
+        usage[date]={}
+        usage[date]['hourly']=0
+        usage[date]['byol']=0
+        usage[date]['legacyfree']=0
+        usage[date]['legacypaid']=0
+        usage[date]['revenue']=0
+        usage[date]['legacyrevenue']=0
 
     with open(filename) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             if 'Hourly' in row['Product Title']:
-                hourly+=int(row['Usage Units'])
-                revenue+=float(row['Estimated Revenue'])
+                usage[date]['hourly']+=int(row['Usage Units'])
+                usage[date]['revenue']+=float(row['Estimated Revenue'])
             elif 'BYOL' in row['Product Title']:
-                byol+=int(row['Usage Units'])
-                revenue+=float(row['Estimated Revenue'])
+                usage[date]['byol']+=int(row['Usage Units'])
+                usage[date]['revenue']+=float(row['Estimated Revenue'])
+            elif float(row['Estimated Revenue'])==0:
+                usage[date]['legacyfree']+=int(row['Usage Units'])
             else:
-                legacy+=int(row['Usage Units'])
-                legacyrevenue+=float(row['Estimated Revenue'])
-
-    return [hourly, byol, legacy, revenue, legacyrevenue]
+                usage[date]['legacypaid']+=int(row['Usage Units'])
+                usage[date]['legacyrevenue']+=float(row['Estimated Revenue'])
 
 def write_usage(usage):
-    print('Month, Hourly Pricing Usage, BYOL Usage, Legacy Usage, Total Usage, Revenue, Legacy Revenue')
+    print('Month, Hourly Pricing Usage, BYOL Usage, Legacy Paid Usage, Legacy Free Usage, Total Usage, Revenue, Legacy Revenue, Total Revenue')
     for date in usage:
-        total = usage[date]['hourly']+usage[date]['byol']+usage[date]['legacy']
-        print(date + ', ' + str(usage[date]['hourly']) + ', ' + str(usage[date]['byol']) + ', ' + str(usage[date]['legacy']) + ', ' + str(total) + ', ' + str(usage[date]['revenue']) + ', ' + str(usage[date]['legacyrevenue']))
+        totalusage = usage[date]['hourly'] + usage[date]['byol'] + usage[date]['legacypaid'] + usage[date]['legacyfree']
+        totalrevenue = usage[date]['revenue'] + usage[date]['legacyrevenue']
+        print(
+            date + ', '
+            + str(usage[date]['hourly']) + ', '
+            + str(usage[date]['byol']) + ', '
+            + str(usage[date]['legacypaid'])+ ', '
+            + str(usage[date]['legacyfree']) + ', '
+            + str(totalusage) + ', '
+            + str(usage[date]['revenue']) + ', '
+            + str(usage[date]['legacyrevenue']) + ', '
+            + str(totalrevenue))
 
 run()
